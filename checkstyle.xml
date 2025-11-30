@@ -4,9 +4,9 @@
         "https://checkstyle.org/dtds/configuration_1_3.dtd">
 
 <module name="Checker">
-    <!-- 行末空白禁止 -->
+    <!-- 行末空白禁止 (空行は許容) -->
     <module name="RegexpSingleline">
-        <property name="format" value="\s+$"/>
+        <property name="format" value="[^\s]\s+$"/>
         <property name="message" value="行末に空白があります"/>
     </module>
     
@@ -17,14 +17,15 @@
             <property name="tabWidth" value="4"/>
         </module>
 
-        <!-- if / while / for の後の空白 -->
-        <module name="WhitespaceAfter">
-            <property name="tokens" value="LITERAL_IF, LITERAL_FOR, LITERAL_WHILE"/>
-        </module>
-
         <!-- 中括弧必須 -->
         <module name="NeedBraces">
             <property name="allowSingleLineStatement" value="false"/>
+        </module>
+
+        <!-- 括弧の前後の空白を禁止 -->
+        <module name="ParenPad">
+            <property name="option" value="nospace"/>
+            <property name="tokens" value="LITERAL_IF,LITERAL_FOR,LITERAL_WHILE"/>
         </module>
     </module>
     

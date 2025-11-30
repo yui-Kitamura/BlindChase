@@ -54,7 +54,7 @@ public final class BlindChase extends JavaPlugin {
     public void onEnable() {
         super.onEnable();
         addCommandHandler();
-        plugin().getLogger().info("BlindChase is enabled!");    
+        plugin().getLogger().info("BlindChase is enabled!");
     }
     private void addCommandHandler(){
         PluginCommand cmd = this.getCommand(CommandHandler.COMMAND);
