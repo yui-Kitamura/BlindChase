@@ -1,4 +1,19 @@
 name: BlindChase
-version: '1.0-SNAPSHOT'
+version: '{$project.version}'
+description: 'Play chase game within a blind'
 main: pro.eng.yui.mcpl.blindChase.BlindChase
 api-version: '1.20'
+
+author: yui-KITAMURA
+
+permissions:
+  blindchase.*:
+    default: op
+
+commands:
+  blindchase:
+    description: BlindChase basic plugin commands
+    permission: blindchase.*
+    aliases: 
+      - blind
+      - bc
