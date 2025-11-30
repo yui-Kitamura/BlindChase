@@ -1,7 +1,9 @@
 package pro.eng.yui.mcpl.blindChase;
 
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import pro.eng.yui.mcpl.blindChase.config.BlindChaseConfig;
+import pro.eng.yui.mcpl.blindChase.impl.command.CommandHandler;
 
 public final class BlindChase extends JavaPlugin {
 
@@ -55,7 +57,14 @@ public final class BlindChase extends JavaPlugin {
         plugin().getLogger().info("BlindChase is enabled!");    
     }
     private void addCommandHandler(){
-        //FIXME add command
+        PluginCommand cmd = this.getCommand(CommandHandler.COMMAND);
+        if (cmd == null) {
+            this.getLogger().warning("Command '" + CommandHandler.COMMAND + "' not found in plugin.yml");
+            return;
+        }
+        CommandHandler handler = new CommandHandler();
+        cmd.setExecutor(handler);
+        cmd.setTabCompleter(handler);
     }
 
     @Override
