@@ -1,4 +1,4 @@
-package pro.eng.yui.mcpl.blindChase.impl.command;
+package pro.eng.yui.mcpl.blindChase.game.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

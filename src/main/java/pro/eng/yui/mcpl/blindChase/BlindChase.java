@@ -3,7 +3,7 @@ package pro.eng.yui.mcpl.blindChase;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import pro.eng.yui.mcpl.blindChase.config.BlindChaseConfig;
-import pro.eng.yui.mcpl.blindChase.impl.command.CommandHandler;
+import pro.eng.yui.mcpl.blindChase.game.command.CommandHandler;
 
 public final class BlindChase extends JavaPlugin {
 

@@ -1,4 +1,4 @@
-package pro.eng.yui.mcpl.blindChase.impl.game;
+package pro.eng.yui.mcpl.blindChase.abst.game;
 
 import pro.eng.yui.mcpl.blindChase.lib.game.Game;
 
