@@ -4,15 +4,13 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
+import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 import pro.eng.yui.mcpl.blindChase.lib.field.WoodSet;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.Random;
 
 public class FieldGenerator {
-
-    private static final String DEFAULT_WORLD_NAME = "blindchase_world";
 
     private FieldGenerator() {
         /* ignore create instance */
@@ -39,7 +37,7 @@ public class FieldGenerator {
     }
 
     public static FieldImpl generate(FieldType type, World world, int pattern, Collection<? extends Player> playersToMove) {
-        World targetWorld = (world != null) ? world : getOrCreateVoidWorld(DEFAULT_WORLD_NAME);
+        World targetWorld = (world != null) ? world : getOrCreateVoidWorld(Field.FIELD_WORLD_NAME);
         FieldImpl field = new FieldImpl(type, targetWorld);
         movePlayersToWaiting(targetWorld, playersToMove);
         generate(targetWorld, pattern);
@@ -90,11 +88,15 @@ public class FieldGenerator {
         fillSquare(world, -50, 50, -50, 50, 0, wood.getPlanks());
 
         // y=20: 20x20 glass with fence on perimeter
-        fillSquare(world, -10, 10, -10, 10, 20, Material.GLASS);
-        placeFencePerimeter(world, -10, 10, -10, 10, 21, wood.getFence());
+        fillSquare(world, -10, 10, -10, 10, 20, wood.getGlass());
+        // replace fence with two-high stained glass perimeter similar to wood color
+        placeTwoHighGlassPerimeter(world, -10, 10, -10, 10, 21, wood.getGlass());
 
         // y=40: 20x20 award floor of logs (same wood type)
         fillSquare(world, -10, 10, -10, 10, 40, wood.getLog());
+
+        // refresh lighting for modified chunks
+        refreshAreaLighting(world, -50, 50, -50, 50);
     }
 
     private static void fillSquare(World world, int xMin, int xMax, int zMin, int zMax, int y, Material material) {
@@ -105,21 +107,39 @@ public class FieldGenerator {
         }
     }
 
-    private static void placeFencePerimeter(World world, int xMin, int xMax, int zMin, int zMax, int y, Material fence) {
+    private static void placeTwoHighGlassPerimeter(World world, int xMin, int xMax, int zMin, int zMax, int baseY, Material glass) {
         for (int x = xMin; x <= xMax; x++) {
-            setBlock(world, x, y, zMin, fence);
-            setBlock(world, x, y, zMax, fence);
+            setBlock(world, x, baseY, zMin, glass);
+            setBlock(world, x, baseY + 1, zMin, glass);
+            setBlock(world, x, baseY, zMax, glass);
+            setBlock(world, x, baseY + 1, zMax, glass);
         }
         for (int z = zMin; z <= zMax; z++) {
-            setBlock(world, xMin, y, z, fence);
-            setBlock(world, xMax, y, z, fence);
+            setBlock(world, xMin, baseY, z, glass);
+            setBlock(world, xMin, baseY + 1, z, glass);
+            setBlock(world, xMax, baseY, z, glass);
+            setBlock(world, xMax, baseY + 1, z, glass);
         }
     }
 
     private static void setBlock(World world, int x, int y, int z, Material material) {
         Block b = world.getBlockAt(x, y, z);
         if (b.getType() != material) {
-            b.setType(material, false);
+            // apply physics to trigger lighting updates
+            b.setType(material, true);
+        }
+    }
+
+    private static void refreshAreaLighting(World world, int xMin, int xMax, int zMin, int zMax) {
+        final int blocksParChunk = 16;
+        int chunkXMin = Math.floorDiv(xMin, blocksParChunk);
+        int chunkXMax = Math.floorDiv(xMax, blocksParChunk);
+        int chunkZMin = Math.floorDiv(zMin, blocksParChunk);
+        int chunkZMax = Math.floorDiv(zMax, blocksParChunk);
+        for (int cx = chunkXMin; cx <= chunkXMax; cx++) {
+            for (int cz = chunkZMin; cz <= chunkZMax; cz++) {
+                world.refreshChunk(cx, cz);
+            }
         }
     }
 }

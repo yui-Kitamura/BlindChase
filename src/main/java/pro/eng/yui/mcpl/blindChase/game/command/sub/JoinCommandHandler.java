@@ -7,13 +7,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import pro.eng.yui.mcpl.blindChase.game.field.FieldGenerator;
 import pro.eng.yui.mcpl.blindChase.game.field.FieldType;
+import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 
 import java.util.Collections;
 
 public final class JoinCommandHandler {
 
     public static final String SUBCOMMAND = "join";
-    private static final String FIELD_WORLD_NAME = "blindchase_world";
 
     private JoinCommandHandler(){
         // ignore create instance
@@ -25,16 +25,19 @@ public final class JoinCommandHandler {
             return true;
         }
 
-        World world = Bukkit.getWorld(FIELD_WORLD_NAME);
+        World world = Bukkit.getWorld(Field.FIELD_WORLD_NAME);
         if (world == null){
             // Create field world and move only this player
-            FieldGenerator.generate(FieldType.FLAT, null, 0, Collections.singleton(player));
-            return true;
+            player.sendMessage("転送先を生成しています…");
+            Field newField = FieldGenerator.generate(FieldType.FLAT, null, 0, Collections.singleton(player));
+            world = newField.world();
         }
 
         // Teleport to waiting center
         Location wait = new Location(world, 0.5, 22.0, 0.5, 0.0f, 0.0f);
+        player.sendMessage("転送します…");
         player.teleport(wait);
+        player.sendMessage("転送しました");
         return true;
     }
 }
