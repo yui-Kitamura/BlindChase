@@ -16,6 +16,8 @@ public abstract class AbstTypeGenerator implements TypeGenerator {
     public final void generate(final World world, final int pattern) {
         if (world == null) { throw new IllegalArgumentException(new NullPointerException("world")); }
         generateBody(world, pattern);
+        // Ensure yellow carpet paths form connected lines on the same Y level
+        ensureYellowCarpetAdjacency(world);
         // Ensure yellow carpets have a solid 3x3 support right beneath them
         ensureYellowCarpetSupport(world);
     }
@@ -65,6 +67,63 @@ public abstract class AbstTypeGenerator implements TypeGenerator {
         for (int cx = chunkXMin; cx <= chunkXMax; cx++) {
             for (int cz = chunkZMin; cz <= chunkZMax; cz++) {
                 world.refreshChunk(cx, cz);
+            }
+        }
+    }
+
+    // ===== Yellow carpet (tactile paving) helpers =====
+
+    protected void placeYellowCarpet(final World world, final int x, final int y, final int z) {
+        setBlock(world, x, y, z, Material.YELLOW_CARPET);
+    }
+
+
+    /**
+     * For every yellow carpet in loaded chunks, ensure at least one of the cross-adjacent
+     * (N,E,S,W) blocks at the same Y is also a yellow carpet. If none exists, place one
+     * in the first available direction in the order +X, -X, +Z, -Z.
+     */
+    protected void ensureYellowCarpetAdjacency(final World world) {
+        if (world == null) { return; }
+
+        final int blocksPerChunk = 16;
+        final int minY = world.getMinHeight();
+        final int maxY = world.getMaxHeight();
+
+        for (final Chunk chunk : world.getLoadedChunks()) {
+            final int baseX = chunk.getX() * blocksPerChunk;
+            final int baseZ = chunk.getZ() * blocksPerChunk;
+
+            for (int lx = 0; lx < blocksPerChunk; lx++) {
+                for (int lz = 0; lz < blocksPerChunk; lz++) {
+                    final int x = baseX + lx;
+                    final int z = baseZ + lz;
+
+                    for (int y = minY; y < maxY; y++) {
+                        final Block b = world.getBlockAt(x, y, z);
+                        if (b.getType() != Material.YELLOW_CARPET) { continue; }
+
+                        // Check four neighbors on the same Y
+                        boolean hasNeighbor =
+                            world.getBlockAt(x + 1, y, z).getType() == Material.YELLOW_CARPET ||
+                            world.getBlockAt(x - 1, y, z).getType() == Material.YELLOW_CARPET ||
+                            world.getBlockAt(x, y, z + 1).getType() == Material.YELLOW_CARPET ||
+                            world.getBlockAt(x, y, z - 1).getType() == Material.YELLOW_CARPET;
+
+                        if (hasNeighbor) { continue; }
+
+                        // Place a neighbor in the first available direction
+                        if (world.getBlockAt(x + 1, y, z).getType() == Material.AIR) {
+                            placeYellowCarpet(world, x + 1, y, z);
+                        } else if (world.getBlockAt(x - 1, y, z).getType() == Material.AIR) {
+                            placeYellowCarpet(world, x - 1, y, z);
+                        } else if (world.getBlockAt(x, y, z + 1).getType() == Material.AIR) {
+                            placeYellowCarpet(world, x, y, z + 1);
+                        } else if (world.getBlockAt(x, y, z - 1).getType() == Material.AIR) {
+                            placeYellowCarpet(world, x, y, z - 1);
+                        }
+                    }
+                }
             }
         }
     }
