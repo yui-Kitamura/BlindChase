@@ -14,8 +14,10 @@ public abstract class AbstTypeGenerator implements TypeGenerator {
 
     @Override
     public final void generate(final World world, final int pattern) {
-        if (world == null) { return; }
+        if (world == null) { throw new IllegalArgumentException(new NullPointerException("world")); }
         generateBody(world, pattern);
+        // Ensure yellow carpets have a solid 3x3 support right beneath them
+        ensureYellowCarpetSupport(world);
     }
 
     protected abstract void generateBody(World world, int pattern);
@@ -63,6 +65,53 @@ public abstract class AbstTypeGenerator implements TypeGenerator {
         for (int cx = chunkXMin; cx <= chunkXMax; cx++) {
             for (int cz = chunkZMin; cz <= chunkZMax; cz++) {
                 world.refreshChunk(cx, cz);
+            }
+        }
+    }
+
+    /**
+     * Helper: For every yellow carpet in loaded chunks, ensure the 3x3 area directly beneath it (y-1)
+     * is filled with blocks. Missing blocks (AIR) are filled using the same material as the block
+     * directly beneath the carpet's center.
+     */
+    protected void ensureYellowCarpetSupport(final World world) {
+        if (world == null) { return; }
+
+        final int blocksPerChunk = 16;
+        final int minY = world.getMinHeight();
+        final int maxY = world.getMaxHeight();
+
+        for (final Chunk chunk : world.getLoadedChunks()) {
+            final int baseX = chunk.getX() * blocksPerChunk;
+            final int baseZ = chunk.getZ() * blocksPerChunk;
+
+            for (int lx = 0; lx < blocksPerChunk; lx++) {
+                for (int lz = 0; lz < blocksPerChunk; lz++) {
+                    final int x = baseX + lx;
+                    final int z = baseZ + lz;
+
+                    for (int y = minY + 1; y < maxY; y++) { // start at minY+1 to safely access y-1
+                        final Block b = world.getBlockAt(x, y, z);
+                        if (b.getType() != Material.YELLOW_CARPET) { continue; }
+
+                        final int supportY = y - 1;
+                        if (supportY < minY) { continue; }
+
+                        final Material centerBelowMat = world.getBlockAt(x, supportY, z).getType();
+                        if (centerBelowMat == Material.AIR) { continue; }
+
+                        for (int dx = -1; dx <= 1; dx++) {
+                            for (int dz = -1; dz <= 1; dz++) {
+                                final int tx = x + dx;
+                                final int tz = z + dz;
+                                final Block target = world.getBlockAt(tx, supportY, tz);
+                                if (target.getType() == Material.AIR) {
+                                    target.setType(centerBelowMat, true);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
