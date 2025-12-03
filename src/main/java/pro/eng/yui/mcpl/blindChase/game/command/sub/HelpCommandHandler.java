@@ -16,6 +16,7 @@ public class HelpCommandHandler extends AbstSubCommandRunner {
     protected boolean executeBody(CommandSender sender, String[] args){
         sender.sendMessage("/blindchase " + RegenerateCommandHandler.SUBCOMMAND);
         sender.sendMessage("/blindchase " + JoinCommandHandler.SUBCOMMAND);
+        sender.sendMessage("/blindchase " + LeaveCommandHandler.SUBCOMMAND);
         sender.sendMessage("/blindchase " + SUBCOMMAND);
         return true;
     }
