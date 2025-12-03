@@ -16,55 +16,35 @@ public class FieldGenerator {
         /* ignore create instance */
     }
 
-    public static FieldImpl generate(FieldType type) {
-        return generate(type, null, 0, Bukkit.getOnlinePlayers());
-    }
-
-    public static FieldImpl generate(FieldType type, int pattern) {
-        return generate(type, null, pattern, Bukkit.getOnlinePlayers());
-    }
-
-    public static FieldImpl generate(FieldType type, World world) {
-        return generate(type, world, 0, Bukkit.getOnlinePlayers());
-    }
-
-    public static FieldImpl generate(FieldType type, World world, int pattern) {
-        return generate(type, world, pattern, Bukkit.getOnlinePlayers());
-    }
-
-    public static FieldImpl generate(FieldType type, int pattern, Collection<? extends Player> playersToMove) {
-        return generate(type, null, pattern, playersToMove);
-    }
-
-    public static FieldImpl generate(FieldType type, World world, int pattern, Collection<? extends Player> playersToMove) {
-        World targetWorld = (world != null) ? world : getOrCreateVoidWorld(Field.FIELD_WORLD_NAME);
-        FieldImpl field = new FieldImpl(type, targetWorld);
+    public static FieldImpl generate(final FieldType type, final World world, final int pattern, final Collection<? extends Player> playersToMove) {
+        final World targetWorld = (world != null) ? world : getOrCreateVoidWorld(Field.FIELD_WORLD_NAME);
+        final FieldImpl field = new FieldImpl(type, targetWorld);
         movePlayersToWaiting(targetWorld, playersToMove);
         generate(targetWorld, pattern);
         return field;
     }
 
-    private static void movePlayersToWaiting(World world, Collection<? extends Player> players) {
+    private static void movePlayersToWaiting(final World world, final Collection<? extends Player> players) {
         if (world == null || players == null) { return; }
-        Location wait = waitingLocation(world);
-        for (Player p : players) {
+        final Location wait = waitingLocation(world);
+        for (final Player p : players) {
             if (p == null) { continue; }
             p.teleport(wait);
         }
     }
 
-    private static Location waitingLocation(World world) {
+    private static Location waitingLocation(final World world) {
         // Center of the glass platform
-        Location loc = new Location(world, 0.5, 22.0, 0.5);
+        final Location loc = new Location(world, 0.5, 22.0, 0.5);
         loc.setYaw(0.0f);
         loc.setPitch(0.0f);
         return loc;
     }
 
-    private static World getOrCreateVoidWorld(String name) {
-        World w = Bukkit.getWorld(name);
+    private static World getOrCreateVoidWorld(final String name) {
+        final World w = Bukkit.getWorld(name);
         if (w != null){ return w; }
-        WorldCreator creator = new WorldCreator(name);
+        final WorldCreator creator = new WorldCreator(name);
         creator.generator(new EmptyChunkGenerator());
         creator.generateStructures(false);
         return Bukkit.createWorld(creator);
@@ -81,8 +61,8 @@ public class FieldGenerator {
         }
     }
 
-    private static void generate(World world, int pattern) {
-        WoodSet wood = WoodSet.of(pattern);
+    private static void generate(final World world, final int pattern) {
+        final WoodSet wood = WoodSet.of(pattern);
 
         // y=0: 100x100 planks (centered around origin: -50..49)
         fillSquare(world, -50, 50, -50, 50, 0, wood.getPlanks());
@@ -99,7 +79,7 @@ public class FieldGenerator {
         refreshAreaLighting(world, -50, 50, -50, 50);
     }
 
-    private static void fillSquare(World world, int xMin, int xMax, int zMin, int zMax, int y, Material material) {
+    private static void fillSquare(final World world, final int xMin, final int xMax, final int zMin, final int zMax, final int y, final Material material) {
         for (int x = xMin; x <= xMax; x++) {
             for (int z = zMin; z <= zMax; z++) {
                 setBlock(world, x, y, z, material);
@@ -107,7 +87,7 @@ public class FieldGenerator {
         }
     }
 
-    private static void placeTwoHighGlassPerimeter(World world, int xMin, int xMax, int zMin, int zMax, int baseY, Material glass) {
+    private static void placeTwoHighGlassPerimeter(final World world, final int xMin, final int xMax, final int zMin, final int zMax, final int baseY, final Material glass) {
         for (int x = xMin; x <= xMax; x++) {
             setBlock(world, x, baseY, zMin, glass);
             setBlock(world, x, baseY + 1, zMin, glass);
@@ -122,20 +102,20 @@ public class FieldGenerator {
         }
     }
 
-    private static void setBlock(World world, int x, int y, int z, Material material) {
-        Block b = world.getBlockAt(x, y, z);
+    private static void setBlock(final World world, final int x, final int y, final int z, final Material material) {
+        final Block b = world.getBlockAt(x, y, z);
         if (b.getType() != material) {
             // apply physics to trigger lighting updates
             b.setType(material, true);
         }
     }
 
-    private static void refreshAreaLighting(World world, int xMin, int xMax, int zMin, int zMax) {
+    private static void refreshAreaLighting(final World world, final int xMin, final int xMax, final int zMin, final int zMax) {
         final int blocksParChunk = 16;
-        int chunkXMin = Math.floorDiv(xMin, blocksParChunk);
-        int chunkXMax = Math.floorDiv(xMax, blocksParChunk);
-        int chunkZMin = Math.floorDiv(zMin, blocksParChunk);
-        int chunkZMax = Math.floorDiv(zMax, blocksParChunk);
+        final int chunkXMin = Math.floorDiv(xMin, blocksParChunk);
+        final int chunkXMax = Math.floorDiv(xMax, blocksParChunk);
+        final int chunkZMin = Math.floorDiv(zMin, blocksParChunk);
+        final int chunkZMax = Math.floorDiv(zMax, blocksParChunk);
         for (int cx = chunkXMin; cx <= chunkXMax; cx++) {
             for (int cz = chunkZMin; cz <= chunkZMax; cz++) {
                 world.refreshChunk(cx, cz);
