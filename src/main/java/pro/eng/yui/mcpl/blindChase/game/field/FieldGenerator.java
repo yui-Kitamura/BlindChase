@@ -8,6 +8,8 @@ import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 import pro.eng.yui.mcpl.blindChase.lib.field.WoodSet;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Collections;
 import java.util.Random;
 
 public class FieldGenerator {
@@ -21,6 +23,7 @@ public class FieldGenerator {
         final FieldImpl field = new FieldImpl(type, targetWorld);
         movePlayersToWaiting(targetWorld, playersToMove);
         generate(targetWorld, pattern);
+        configureRespawn(targetWorld, playersToMove);
         return field;
     }
 
@@ -120,6 +123,21 @@ public class FieldGenerator {
             for (int cz = chunkZMin; cz <= chunkZMax; cz++) {
                 world.refreshChunk(cx, cz);
             }
+        }
+    }
+
+    private static void configureRespawn(final World world, final Collection<? extends Player> players) {
+        if (world == null) { return; }
+        final Location wait = waitingLocation(world);
+        world.setSpawnLocation(wait);
+        world.setGameRule(GameRule.SPAWN_RADIUS, 0);
+
+        final HashSet<Player> targets = new HashSet<>();
+        if (players != null) { targets.addAll(players); }
+        targets.addAll(world.getPlayers());
+        for (final Player p : targets) {
+            if (p == null) { continue; }
+            p.setBedSpawnLocation(wait, true);
         }
     }
 }
