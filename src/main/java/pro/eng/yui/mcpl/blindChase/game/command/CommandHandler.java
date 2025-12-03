@@ -9,10 +9,7 @@ import pro.eng.yui.mcpl.blindChase.game.command.sub.JoinCommandHandler;
 import pro.eng.yui.mcpl.blindChase.game.command.sub.RegenerateCommandHandler;
 import pro.eng.yui.mcpl.blindChase.lib.command.ISubCommandRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class CommandHandler implements CommandExecutor, TabCompleter {
     
@@ -22,6 +19,20 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         if (name == null){ return null; }
         String key = name.toLowerCase();
         return runners.get(key);
+    }
+    private List<String> findRunnerWithNameHead(final CommandSender sender, final String input){
+        List<String> result = new ArrayList<>();
+        final String inputLower = input.toLowerCase();
+        final boolean returnAll = inputLower.isEmpty();
+        Set<String> keys = runners.keySet();
+        for(String k : keys) {
+            if (returnAll || k.startsWith(inputLower)) {
+                if(sender.hasPermission(runners.get(k).getPermission())) {
+                    result.add(k);
+                }
+            }
+        }
+        return result;
     }
     
     /** コンストラクタ */
@@ -61,16 +72,11 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         }
         List<String> completions = new ArrayList<>();
         if (args.length == 0){
-            completions.addAll(runners.keySet());
+            completions = findRunnerWithNameHead(sender, "");
             return completions;
         }
         if (args.length == 1){
-            String prefix = args[0].toLowerCase();
-            for (String name : runners.keySet()){
-                if (name.startsWith(prefix)){
-                    completions.add(name);
-                }
-            }
+            completions = findRunnerWithNameHead(sender, args[0]);
             return completions;
         }
         return completions;
