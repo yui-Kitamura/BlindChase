@@ -13,7 +13,6 @@ permissions:
 commands:
   blindchase:
     description: BlindChase basic plugin commands
-    permission: blindchase.*
     aliases: 
       - blind
       - bc
