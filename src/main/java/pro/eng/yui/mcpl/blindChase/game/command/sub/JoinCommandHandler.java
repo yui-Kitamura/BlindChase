@@ -6,21 +6,24 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permission;
+import pro.eng.yui.mcpl.blindChase.abst.command.Permissions;
 import pro.eng.yui.mcpl.blindChase.game.field.FieldGenerator;
 import pro.eng.yui.mcpl.blindChase.game.field.FieldType;
+import pro.eng.yui.mcpl.blindChase.abst.command.AbstSubCommandRunner;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 
 import java.util.Collections;
 
-public final class JoinCommandHandler {
+public class JoinCommandHandler extends AbstSubCommandRunner {
 
     public static final String SUBCOMMAND = "join";
+    public static final Permission PERMISSION = new Permission(Permissions.JOIN.get());
 
-    private JoinCommandHandler(){
-        // ignore create instance
-    }
+    public JoinCommandHandler(){ super(SUBCOMMAND, PERMISSION); }
 
-    public static boolean execute(CommandSender sender, String[] args){
+    @Override
+    protected boolean executeBody(CommandSender sender, String[] args){
         if (!(sender instanceof Player player)){
             sender.sendMessage("このコマンドはプレイヤーのみが実行できます");
             return true;
@@ -36,7 +39,7 @@ public final class JoinCommandHandler {
 
         // Teleport to waiting location
         Location wait = new Location(world, 0.5, 22.0, 0.5, 0.0f, 0.0f);
-        // Fix respawn 
+        // Fix respawn
         world.setSpawnLocation(wait);
         world.setGameRule(GameRule.SPAWN_RADIUS, 0);
         player.setBedSpawnLocation(wait, true);
