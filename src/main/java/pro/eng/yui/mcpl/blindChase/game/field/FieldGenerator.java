@@ -6,6 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 import pro.eng.yui.mcpl.blindChase.lib.field.WoodSet;
+import pro.eng.yui.mcpl.blindChase.lib.field.type.TypeGenerator;
+import pro.eng.yui.mcpl.blindChase.game.field.type.Flat;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -21,7 +23,11 @@ public class FieldGenerator {
         final World targetWorld = (world != null) ? world : getOrCreateVoidWorld(Field.FIELD_WORLD_NAME);
         final FieldImpl field = new FieldImpl(type, targetWorld);
         movePlayersToWaiting(targetWorld, playersToMove);
-        generate(targetWorld, pattern);
+        // delegate type-specific block generation
+        final TypeGenerator generator = switch (type) {
+            case FLAT -> new Flat();
+        };
+        generator.generate(targetWorld, pattern);
         configureRespawn(targetWorld, playersToMove);
         return field;
     }
@@ -63,23 +69,7 @@ public class FieldGenerator {
         }
     }
 
-    private static void generate(final World world, final int pattern) {
-        final WoodSet wood = WoodSet.of(pattern);
-
-        // y=0: 100x100 planks (centered around origin: -50..49)
-        fillSquare(world, -50, 50, -50, 50, 0, wood.getPlanks());
-
-        // y=20: 20x20 glass with fence on perimeter
-        fillSquare(world, -10, 10, -10, 10, 20, wood.getGlass());
-        // replace fence with two-high stained glass perimeter similar to wood color
-        placeTwoHighGlassPerimeter(world, -10, 10, -10, 10, 21, wood.getGlass());
-
-        // y=40: 20x20 award floor of logs (same wood type)
-        fillSquare(world, -10, 10, -10, 10, 40, wood.getLog());
-
-        // refresh lighting for modified chunks
-        refreshAreaLighting(world, -50, 50, -50, 50);
-    }
+    // type-specific generation moved to generators
 
     private static void fillSquare(final World world, final int xMin, final int xMax, final int zMin, final int zMax, final int y, final Material material) {
         for (int x = xMin; x <= xMax; x++) {
