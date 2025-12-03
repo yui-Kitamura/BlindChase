@@ -1,9 +1,13 @@
 package pro.eng.yui.mcpl.blindChase;
 
+import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import pro.eng.yui.mcpl.blindChase.config.BlindChaseConfig;
 import pro.eng.yui.mcpl.blindChase.game.command.CommandHandler;
+import pro.eng.yui.mcpl.blindChase.game.field.FieldGenerator;
+import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 
 public final class BlindChase extends JavaPlugin {
 
@@ -45,15 +49,16 @@ public final class BlindChase extends JavaPlugin {
         BlindChaseConfig.load();
     }
     private void outputCopyright() {
-        this.getLogger().info("=== BlindChase copyright ===");
-        this.getLogger().info("= all right reserved by Yui-KITAMURA =");
-        this.getLogger().info("=== (C)Yui-KITAMURA 2025- ===");
+        plugin().getLogger().info("=== BlindChase copyright ===");
+        plugin().getLogger().info("= all right reserved by Yui-KITAMURA =");
+        plugin().getLogger().info("=== (C)Yui-KITAMURA 2025- ===");
     }
     
     @Override
     public void onEnable() {
         super.onEnable();
         addCommandHandler();
+        loadWorld();
         plugin().getLogger().info("BlindChase is enabled!");
     }
     private void addCommandHandler(){
@@ -65,6 +70,10 @@ public final class BlindChase extends JavaPlugin {
         CommandHandler handler = new CommandHandler();
         cmd.setExecutor(handler);
         cmd.setTabCompleter(handler);
+    }
+    private void loadWorld() {
+        FieldGenerator.getOrCreateVoidWorld(Field.FIELD_WORLD_NAME);
+        plugin().getLogger().info("BlindChase world is loaded!");
     }
 
     @Override

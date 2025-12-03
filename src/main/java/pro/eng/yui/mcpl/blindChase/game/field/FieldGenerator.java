@@ -9,7 +9,6 @@ import pro.eng.yui.mcpl.blindChase.lib.field.WoodSet;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Collections;
 import java.util.Random;
 
 public class FieldGenerator {
@@ -44,7 +43,7 @@ public class FieldGenerator {
         return loc;
     }
 
-    private static World getOrCreateVoidWorld(final String name) {
+    public static World getOrCreateVoidWorld(final String name) {
         final World w = Bukkit.getWorld(name);
         if (w != null){ return w; }
         final WorldCreator creator = new WorldCreator(name);
