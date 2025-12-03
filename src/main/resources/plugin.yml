@@ -1,5 +1,5 @@
 name: BlindChase
-version: '{$project.version}'
+version: '${project.version}'
 description: 'Play chase game within a blind'
 main: pro.eng.yui.mcpl.blindChase.BlindChase
 api-version: '1.20'
