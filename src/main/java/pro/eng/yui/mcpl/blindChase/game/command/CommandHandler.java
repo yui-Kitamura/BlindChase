@@ -8,6 +8,7 @@ import pro.eng.yui.mcpl.blindChase.game.command.sub.HelpCommandHandler;
 import pro.eng.yui.mcpl.blindChase.game.command.sub.JoinCommandHandler;
 import pro.eng.yui.mcpl.blindChase.game.command.sub.LeaveCommandHandler;
 import pro.eng.yui.mcpl.blindChase.game.command.sub.RegenerateCommandHandler;
+import pro.eng.yui.mcpl.blindChase.game.command.sub.StartCommandHandler;
 import pro.eng.yui.mcpl.blindChase.lib.command.ISubCommandRunner;
 
 import java.util.*;
@@ -42,6 +43,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         register(new RegenerateCommandHandler());
         register(new JoinCommandHandler());
         register(new LeaveCommandHandler());
+        register(new StartCommandHandler());
         register(new HelpCommandHandler());
     }
     private void register(final ISubCommandRunner runner){

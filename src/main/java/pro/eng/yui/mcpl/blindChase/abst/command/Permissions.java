@@ -8,6 +8,7 @@ public enum Permissions {
     JOIN("blindchase.join"),
     LEAVE("blindchase.leave"),
     REGENERATE("blindchase.regenerate"),
+    START("blindchase.start"),
     ADMIN("blindchase.admin"),
     ALL("blindchase.all")
     ;

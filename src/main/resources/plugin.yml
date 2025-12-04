@@ -9,6 +9,8 @@ author: yui-KITAMURA
 permissions:
   blindchase.*:
     default: op
+  blindchase.start:
+    default: op
 
 commands:
   blindchase:
