@@ -87,7 +87,9 @@ final class GitHubReleaseClient {
             } catch (IOException e) {
                 last = e;
             } finally {
-                if (conn != null) conn.disconnect();
+                if (conn != null) {
+                    conn.disconnect();
+                }
             }
         }
         throw last != null ? last : new IOException("GitHub fetch failed");
@@ -98,7 +100,9 @@ final class GitHubReleaseClient {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {
             StringBuilder sb = new StringBuilder();
             String line;
-            while ((line = br.readLine()) != null) sb.append(line).append('\n');
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append('\n');
+            }
             return sb.toString();
         }
     }
@@ -116,7 +120,9 @@ final class GitHubReleaseClient {
         while (m.find()) {
             String name = m.group(1);
             String url = m.group(2);
-            if (name == null || url == null) continue;
+            if (name == null || url == null) {
+                continue;
+            }
             if (assetNamePattern.matcher(name).matches()) {
                 foundName = name;
                 foundUrl = url;

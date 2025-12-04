@@ -152,18 +152,24 @@ public final class ResourcePackService {
             } catch (IOException e) {
                 last = e;
             } finally {
-                if (conn != null) conn.disconnect();
+                if (conn != null) {
+                    conn.disconnect();
+                }
             }
         }
         throw last != null ? last : new IOException("fetch failed");
     }
 
     private static byte[] readAllBytes(InputStream in) throws IOException {
-        if (in == null) return new byte[0];
+        if (in == null) {
+            return new byte[0];
+        }
         try (InputStream is = in; ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             byte[] buf = new byte[8192];
             int n;
-            while ((n = is.read(buf)) > 0) baos.write(buf, 0, n);
+            while ((n = is.read(buf)) > 0) {
+                baos.write(buf, 0, n);
+            }
             return baos.toByteArray();
         }
     }
@@ -175,13 +181,17 @@ public final class ResourcePackService {
 
     private static byte[] hexToBytes(String hex) {
         hex = hex.replaceAll("[^0-9A-Fa-f]", "");
-        if (hex.length() < 40) return null;
+        if (hex.length() < 40) {
+            return null;
+        }
         int len = 20;
         byte[] out = new byte[len];
         for (int i = 0; i < len; i++) {
             int hi = Character.digit(hex.charAt(i * 2), 16);
             int lo = Character.digit(hex.charAt(i * 2 + 1), 16);
-            if (hi < 0 || lo < 0) return null;
+            if (hi < 0 || lo < 0) {
+                return null;
+            }
             out[i] = (byte) ((hi << 4) + lo);
         }
         return out;
