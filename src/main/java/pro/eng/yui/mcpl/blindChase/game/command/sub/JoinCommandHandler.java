@@ -14,10 +14,15 @@ import pro.eng.yui.mcpl.blindChase.game.field.FieldGenerator;
 import pro.eng.yui.mcpl.blindChase.game.field.FieldType;
 import pro.eng.yui.mcpl.blindChase.abst.command.AbstSubCommandRunner;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
+import pro.eng.yui.mcpl.blindChase.lib.item.WhiteCaneUtil;
+import pro.eng.yui.mcpl.blindChase.lib.resourcepack.ResourcePackService;
+
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Collections;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class JoinCommandHandler extends AbstSubCommandRunner {
 
@@ -33,7 +38,7 @@ public class JoinCommandHandler extends AbstSubCommandRunner {
             return true;
         }
 
-        // Save player's original location before teleporting
+        // Save player's original location, inventory and XP before teleporting
         try {
             File playersDir = new File(BlindChase.plugin().getDataFolder(), "players");
             if (!playersDir.exists() && !playersDir.mkdirs()) {
@@ -48,6 +53,17 @@ public class JoinCommandHandler extends AbstSubCommandRunner {
                 yaml.set("z", cur.getZ());
                 yaml.set("yaw", cur.getYaw());
                 yaml.set("pitch", cur.getPitch());
+                // inventory
+                ItemStack[] contents = player.getInventory().getContents();
+                ItemStack[] armor = player.getInventory().getArmorContents();
+                ItemStack offhand = player.getInventory().getItemInOffHand();
+                yaml.set("inv.contents", Arrays.asList(contents));
+                yaml.set("inv.armor", Arrays.asList(armor));
+                yaml.set("inv.offhand", offhand);
+                // experience
+                yaml.set("xp.level", player.getLevel());
+                yaml.set("xp.exp", (double) player.getExp()); // store as double for YAML
+                yaml.set("xp.total", player.getTotalExperience());
                 yaml.save(saveFile);
             }
         } catch (IOException e) {
@@ -71,6 +87,20 @@ public class JoinCommandHandler extends AbstSubCommandRunner {
         player.setBedSpawnLocation(wait, true);
         player.sendMessage("転送します…");
         player.teleport(wait);
+        // Clear inventory for the game and give one White Cane
+        player.getInventory().clear();
+        player.getInventory().setArmorContents(new ItemStack[4]);
+        player.getInventory().setItemInOffHand(null);
+        player.getInventory().addItem(WhiteCaneUtil.createWhiteCane());
+        // Set experience to 0.8Lv as requested
+        player.setTotalExperience(0);
+        player.setLevel(0);
+        player.setExp(0.8f);
+        // Apply resource pack from GitHub releases (if resolved)
+        ResourcePackService svc = ResourcePackService.get();
+        if (svc != null) {
+            svc.applyToPlayer(player);
+        }
         player.sendMessage("転送しました");
         return true;
     }
