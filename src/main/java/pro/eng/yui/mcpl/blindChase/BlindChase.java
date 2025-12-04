@@ -57,14 +57,15 @@ public final class BlindChase extends JavaPlugin {
     @Override
     public void onEnable() {
         super.onEnable();
+        plugin = this;
         addCommandHandler();
         loadWorld();
         plugin().getLogger().info("BlindChase is enabled!");
     }
     private void addCommandHandler(){
-        PluginCommand cmd = this.getCommand(CommandHandler.COMMAND);
+        PluginCommand cmd = plugin().getCommand(CommandHandler.COMMAND);
         if (cmd == null) {
-            this.getLogger().warning("Command '" + CommandHandler.COMMAND + "' not found in plugin.yml");
+            plugin().getLogger().warning("Command '" + CommandHandler.COMMAND + "' not found in plugin.yml");
             return;
         }
         CommandHandler handler = new CommandHandler();
