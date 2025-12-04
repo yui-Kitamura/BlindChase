@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import pro.eng.yui.mcpl.blindChase.BlindChase;
+import pro.eng.yui.mcpl.blindChase.config.BlindChaseConfig;
+import pro.eng.yui.mcpl.blindChase.config.ConfigKey;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -60,14 +62,13 @@ public final class ResourcePackService {
 
     private ResourcePackService(Plugin plugin) {
         this.plugin = Objects.requireNonNull(plugin);
-        var cfg = BlindChase.plugin().getConfig();
-        this.ghUser = cfg.getString("resourcePack.github.user", "");
-        this.ghRepo = cfg.getString("resourcePack.github.repo", "");
+        this.ghUser = BlindChaseConfig.getString(ConfigKey.RESOURCEPACK_GITHUB_USER, "");
+        this.ghRepo = BlindChaseConfig.getString(ConfigKey.RESOURCEPACK_GITHUB_REPO, "");
         this.assetNamePattern = Pattern.compile("^BlindChase-(?<tag>.+)-resourcepack\\.zip$");
         this.prompt = "BlindChase Resource Pack を適用します";
-        int timeoutSec = cfg.getInt("resourcePack.timeoutSec", 10);
+        int timeoutSec = BlindChaseConfig.getInt(ConfigKey.RESOURCEPACK_TIMEOUT_SEC, 10);
         this.timeoutMs = Math.max(1000, timeoutSec * 1000);
-        this.retries = Math.max(0, cfg.getInt("resourcePack.retries", 2));
+        this.retries = Math.max(0, BlindChaseConfig.getInt(ConfigKey.RESOURCEPACK_RETRIES, 2));
     }
 
     public void resolveAsync() {
@@ -76,6 +77,7 @@ public final class ResourcePackService {
                 resolveNow();
             } catch (Exception e) {
                 plugin.getLogger().warning("ResourcePack resolve failed: " + e.getMessage());
+                e.printStackTrace();
             }
         });
     }
