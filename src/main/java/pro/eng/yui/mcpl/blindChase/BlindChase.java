@@ -1,13 +1,15 @@
 package pro.eng.yui.mcpl.blindChase;
 
-import org.bukkit.World;
-import org.bukkit.WorldCreator;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
 import pro.eng.yui.mcpl.blindChase.config.BlindChaseConfig;
 import pro.eng.yui.mcpl.blindChase.game.command.CommandHandler;
 import pro.eng.yui.mcpl.blindChase.game.field.FieldGenerator;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
+import pro.eng.yui.mcpl.blindChase.game.listener.WhiteCaneRightClickListener;
+import pro.eng.yui.mcpl.blindChase.lib.resourcepack.ResourcePackService;
+import pro.eng.yui.mcpl.blindChase.lib.resourcepack.ResourcePackStatusListener;
 
 public final class BlindChase extends JavaPlugin {
 
@@ -59,6 +61,8 @@ public final class BlindChase extends JavaPlugin {
         super.onEnable();
         plugin = this;
         addCommandHandler();
+        addListeners();
+        ResourcePackService.init(this);
         loadWorld();
         plugin().getLogger().info("BlindChase is enabled!");
     }
@@ -71,6 +75,11 @@ public final class BlindChase extends JavaPlugin {
         CommandHandler handler = new CommandHandler();
         cmd.setExecutor(handler);
         cmd.setTabCompleter(handler);
+    }
+    private void addListeners(){
+        PluginManager pm = plugin().getServer().getPluginManager();
+        pm.registerEvents(new WhiteCaneRightClickListener(), this);
+        pm.registerEvents(new ResourcePackStatusListener(), this);
     }
     private void loadWorld() {
         FieldGenerator.getOrCreateVoidWorld(Field.FIELD_WORLD_NAME);
