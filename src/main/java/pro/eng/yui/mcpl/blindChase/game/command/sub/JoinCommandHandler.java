@@ -15,6 +15,7 @@ import pro.eng.yui.mcpl.blindChase.game.field.FieldType;
 import pro.eng.yui.mcpl.blindChase.abst.command.AbstSubCommandRunner;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 import pro.eng.yui.mcpl.blindChase.lib.item.WhiteCaneUtil;
+import pro.eng.yui.mcpl.blindChase.lib.resourcepack.ResourcePackService;
 
 import org.bukkit.inventory.ItemStack;
 
@@ -95,6 +96,11 @@ public class JoinCommandHandler extends AbstSubCommandRunner {
         player.setTotalExperience(0);
         player.setLevel(0);
         player.setExp(0.8f);
+        // Apply resource pack from GitHub releases (if resolved)
+        ResourcePackService svc = ResourcePackService.get();
+        if (svc != null) {
+            svc.applyToPlayer(player);
+        }
         player.sendMessage("転送しました");
         return true;
     }

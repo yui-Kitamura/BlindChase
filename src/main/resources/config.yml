@@ -8,3 +8,12 @@
 # Check GitHub @yui-Kitamura        #
 # ################################# #
 
+
+
+resourcePack:
+  github:
+    user: yui-Kitamura
+    repo: BlindChase
+  # network
+  timeoutSec: 10
+  retries: 2
