@@ -39,7 +39,7 @@ jobs:
       - name: Locate shaded JAR and create checksum
         id: jar
         run: |
-          JAR=$(ls target/*-shaded.jar | head -n1)
+          JAR=$(ls target/*.jar | head -n1)
           echo "file=${JAR}" >> $GITHUB_OUTPUT
           SHA="${JAR}.sha1"
           sha1sum "${JAR}" | awk '{print $1}' > "${SHA}"
