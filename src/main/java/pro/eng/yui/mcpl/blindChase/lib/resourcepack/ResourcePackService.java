@@ -6,6 +6,7 @@ import org.bukkit.plugin.Plugin;
 import pro.eng.yui.mcpl.blindChase.BlindChase;
 import pro.eng.yui.mcpl.blindChase.config.BlindChaseConfig;
 import pro.eng.yui.mcpl.blindChase.config.ConfigKey;
+import pro.eng.yui.mcpl.blindChase.lib.util.GitHubReleaseClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -89,26 +90,26 @@ public final class ResourcePackService {
         String ver = BlindChase.plugin().getDescription().getVersion();
         GitHubReleaseClient client = new GitHubReleaseClient(ghUser, ghRepo, assetNamePattern, timeoutMs, retries);
         GitHubReleaseClient.ResolvedAsset ra = client.resolveByMatchVersionThenLatest(ver);
-        this.lastInfo = new Info(ver, ra.tag, ra.assetName, ra.downloadUrl);
+        this.lastInfo = new Info(ver, ra.getTag(), ra.getAssetName(), ra.getDownloadUrl());
         // obtain sha1
         byte[] sha = null;
-        if (ra.sha1Url != null) {
+        if (ra.getSha1Url() != null) {
             try {
-                String hex = new String(fetch(ra.sha1Url), java.nio.charset.StandardCharsets.UTF_8).trim();
+                String hex = new String(fetch(ra.getSha1Url()), java.nio.charset.StandardCharsets.UTF_8).trim();
                 sha = hexToBytes(hex);
             } catch (Exception ignored) {}
         }
         if (sha == null) {
             // compute by downloading file into memory once
             try {
-                byte[] data = fetch(ra.downloadUrl);
+                byte[] data = fetch(ra.getDownloadUrl());
                 sha = sha1(data);
             } catch (Exception e) {
                 plugin.getLogger().warning("Failed to compute SHA-1: " + e.getMessage());
             }
         }
         this.lastSha1 = sha; // may be null
-        plugin.getLogger().info("Resolved resource pack: tag=" + ra.tag + " asset=" + ra.assetName);
+        plugin.getLogger().info("Resolved resource pack: tag=" + ra.getTag() + " asset=" + ra.getAssetName());
     }
 
     public void applyToPlayer(Player player) {

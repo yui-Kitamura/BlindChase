@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 /**
  * Minimal GitHub Releases client using public API with no auth.
  */
-final class GitHubReleaseClient {
+public final class GitHubReleaseClient {
 
     static final class ResolvedAsset {
         final String tag;
@@ -36,7 +36,7 @@ final class GitHubReleaseClient {
     private final int timeoutMs;
     private final int retries;
 
-    GitHubReleaseClient(String user, String repo, Pattern assetNamePattern, int timeoutMs, int retries) {
+    public GitHubReleaseClient(String user, String repo, Pattern assetNamePattern, int timeoutMs, int retries) {
         this.user = Objects.requireNonNull(user);
         this.repo = Objects.requireNonNull(repo);
         this.assetNamePattern = Objects.requireNonNull(assetNamePattern);
@@ -44,7 +44,7 @@ final class GitHubReleaseClient {
         this.retries = Math.max(0, retries);
     }
 
-    ResolvedAsset resolveByMatchVersionThenLatest(String pluginVersion) throws IOException {
+    public ResolvedAsset resolveByMatchVersionThenLatest(String pluginVersion) throws IOException {
         IOException last = null;
         // try exact tag
         if (pluginVersion != null && !pluginVersion.isBlank()) {
