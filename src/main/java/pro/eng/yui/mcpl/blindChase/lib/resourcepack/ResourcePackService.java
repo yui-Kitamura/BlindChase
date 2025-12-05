@@ -63,7 +63,7 @@ public final class ResourcePackService {
         this.plugin = Objects.requireNonNull(plugin);
         this.ghUser = BlindChaseConfig.getString(ConfigKey.RESOURCEPACK_GITHUB_USER, "");
         this.ghRepo = BlindChaseConfig.getString(ConfigKey.RESOURCEPACK_GITHUB_REPO, "");
-        this.assetNamePattern = Pattern.compile("^BlindChase-(?<tag>\\d+\\.\\d+\\.\\d+)-resourcepack\\.zip$");
+        this.assetNamePattern = Pattern.compile("^BlindChase-(?<tag>\\d+\\.\\d+\\.\\d+[a-z]*)-resourcepack\\.zip$");
         this.prompt = "BlindChase Resource Pack を適用します";
         int timeoutSec = BlindChaseConfig.getInt(ConfigKey.RESOURCEPACK_TIMEOUT_SEC, 10);
         this.timeoutMs = Math.max(1000, timeoutSec * 1000);
