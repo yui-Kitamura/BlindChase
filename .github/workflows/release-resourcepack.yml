@@ -32,8 +32,9 @@ jobs:
         run: |
           # Zip the CONTENTS of resourcepack so that pack.mcmeta is at the ZIP root
           cd src/main/resources/resourcepack
-          zip -r "../../${{ steps.prep.outputs.zip }}" .
-          ls -l "../../${{ steps.prep.outputs.zip }}"
+          # Place the zip into src/main/resources so the upload path matches
+          zip -r "../${{ steps.prep.outputs.zip }}" .
+          ls -l "../${{ steps.prep.outputs.zip }}"
 
       - name: Locate JAR
         id: jar
