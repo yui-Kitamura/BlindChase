@@ -14,8 +14,10 @@ public class ResourcePackStatusListener implements Listener {
                 e.getPlayer().sendMessage(ChatColor.RED + "（警告）リソースパックが拒否されました" + ChatColor.RESET);
                 break;
             case FAILED_DOWNLOAD:
+                e.getPlayer().sendMessage(ChatColor.RED + "（警告）リソースパックのダウンロードに失敗しました" + ChatColor.RESET);
+                break;
             case FAILED_RELOAD:
-                e.getPlayer().sendMessage(ChatColor.RED + "（警告）リソースパックのダウンロード/適用に失敗しました" + ChatColor.RESET);
+                e.getPlayer().sendMessage(ChatColor.RED + "（警告）リソースパックの再適用に失敗しました" + ChatColor.RESET);
                 break;
             case ACCEPTED:
             case SUCCESSFULLY_LOADED:
