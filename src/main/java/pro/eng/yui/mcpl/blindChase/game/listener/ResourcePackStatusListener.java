@@ -1,4 +1,4 @@
-package pro.eng.yui.mcpl.blindChase.lib.resourcepack;
+package pro.eng.yui.mcpl.blindChase.game.listener;
 
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;

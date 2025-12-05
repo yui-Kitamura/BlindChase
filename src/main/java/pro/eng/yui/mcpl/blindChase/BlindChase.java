@@ -9,7 +9,7 @@ import pro.eng.yui.mcpl.blindChase.game.field.FieldGenerator;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 import pro.eng.yui.mcpl.blindChase.game.listener.WhiteCaneRightClickListener;
 import pro.eng.yui.mcpl.blindChase.lib.resourcepack.ResourcePackService;
-import pro.eng.yui.mcpl.blindChase.lib.resourcepack.ResourcePackStatusListener;
+import pro.eng.yui.mcpl.blindChase.game.listener.ResourcePackStatusListener;
 
 public final class BlindChase extends JavaPlugin {
 
