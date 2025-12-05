@@ -125,10 +125,7 @@ public final class ResourcePackService {
                 player.setResourcePack(info.url);
             }
         } catch (Throwable t) {
-            // for older API fallback
-            try {
-                player.setResourcePack(info.url);
-            } catch (Throwable ignored) {}
+            t.printStackTrace();
         }
     }
 
