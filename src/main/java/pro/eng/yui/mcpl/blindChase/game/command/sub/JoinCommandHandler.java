@@ -96,11 +96,6 @@ public class JoinCommandHandler extends AbstSubCommandRunner {
         player.setTotalExperience(0);
         player.setLevel(0);
         player.setExp(0.8f);
-        // Apply resource pack from GitHub releases (if resolved)
-        ResourcePackService svc = ResourcePackService.get();
-        if (svc != null) {
-            svc.applyToPlayer(player);
-        }
         player.sendMessage("転送しました");
         return true;
     }
