@@ -60,22 +60,15 @@ public final class GitHubReleaseClient {
         IOException last = null;
         // try exact tag
         if (pluginVersion != null && !pluginVersion.isBlank()) {
-            String[] tags = new String[]{pluginVersion, "v" + pluginVersion};
-            for (String t : tags) {
-                try {
-                    return resolveFromReleaseJson(fetch("https://api.github.com/repos/" + user + "/" + repo + "/releases/tags/" + t));
-                } catch (IOException e) {
-                    last = e;
-                }
+            try {
+                // tag は v1.2.3 に対応して 1.2.3 を決め打ち
+                return resolveFromReleaseJson(fetch("https://api.github.com/repos/" + user + "/" + repo + "/releases/tags/" + pluginVersion));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
         // fallback latest
-        try {
-            return resolveFromReleaseJson(fetch("https://api.github.com/repos/" + user + "/" + repo + "/releases/latest"));
-        } catch (IOException e) {
-            last = e;
-        }
-        throw last != null ? last : new IOException("Failed to resolve release");
+        return resolveFromReleaseJson(fetch("https://api.github.com/repos/" + user + "/" + repo + "/releases/latest"));
     }
 
     private String fetch(String urlStr) throws IOException {
