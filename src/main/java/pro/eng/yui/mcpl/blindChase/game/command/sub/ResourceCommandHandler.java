@@ -1,6 +1,7 @@
 package pro.eng.yui.mcpl.blindChase.game.command.sub;
 
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import pro.eng.yui.mcpl.blindChase.BlindChase;
 import pro.eng.yui.mcpl.blindChase.abst.command.AbstSubCommandRunner;
@@ -25,7 +26,12 @@ public class ResourceCommandHandler extends AbstSubCommandRunner {
             case "reload":
                 try {
                     ResourcePackService.get().resolveNow();
-                    sender.sendMessage("Resource pack info reloaded.");
+                    if(sender instanceof Player player) {
+                        ResourcePackService.get().applyToPlayer(player);
+                        sender.sendMessage("Resource pack reloaded and re-applied to you.");
+                    } else {
+                        sender.sendMessage("Resource pack reloaded");
+                    }
                 } catch (Exception e) {
                     sender.sendMessage("Reload failed: " + e.getMessage());
                     e.printStackTrace();

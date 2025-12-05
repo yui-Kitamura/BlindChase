@@ -27,32 +27,26 @@ jobs:
           TAG="${GITHUB_REF_NAME}"
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "zip=BlindChase-${TAG}-resourcepack.zip" >> $GITHUB_OUTPUT
-          echo "sha=BlindChase-${TAG}-resourcepack.zip.sha1" >> $GITHUB_OUTPUT
 
       - name: Create resource pack zip
         run: |
-          cd src/main/resources
-          zip -r "${{ steps.prep.outputs.zip }}" resourcepack
-          sha1sum "${{ steps.prep.outputs.zip }}" | awk '{print $1}' > "${{ steps.prep.outputs.sha }}"
-          ls -l "${{ steps.prep.outputs.zip }}" "${{ steps.prep.outputs.sha }}"
+          # Zip the CONTENTS of resourcepack so that pack.mcmeta is at the ZIP root
+          cd src/main/resources/resourcepack
+          zip -r "../../${{ steps.prep.outputs.zip }}" .
+          ls -l "../../${{ steps.prep.outputs.zip }}"
 
-      - name: Locate shaded JAR and create checksum
+      - name: Locate JAR
         id: jar
         run: |
           JAR=$(ls target/*.jar | head -n1)
           echo "file=${JAR}" >> $GITHUB_OUTPUT
-          SHA="${JAR}.sha1"
-          sha1sum "${JAR}" | awk '{print $1}' > "${SHA}"
-          echo "sha=${SHA}" >> $GITHUB_OUTPUT
-          ls -l "${JAR}" "${SHA}"
+          ls -l "${JAR}"
 
       - name: Upload assets to release
         uses: softprops/action-gh-release@v2.5.0
         with:
           files: |
             src/main/resources/${{ steps.prep.outputs.zip }}
-            src/main/resources/${{ steps.prep.outputs.sha }}
             ${{ steps.jar.outputs.file }}
-            ${{ steps.jar.outputs.sha }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
