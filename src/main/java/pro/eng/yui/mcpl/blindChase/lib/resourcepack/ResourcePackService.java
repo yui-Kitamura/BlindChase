@@ -137,6 +137,7 @@ public final class ResourcePackService {
     // utils
     private byte[] fetch(String urlStr) throws IOException {
         IOException last = null;
+        BlindChase.plugin().getLogger().info(urlStr);
         for (int i = 0; i <= retries; i++) {
             HttpURLConnection conn = null;
             try {
