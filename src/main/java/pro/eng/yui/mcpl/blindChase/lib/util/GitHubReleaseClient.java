@@ -1,4 +1,4 @@
-package pro.eng.yui.mcpl.blindChase.lib.resourcepack;
+package pro.eng.yui.mcpl.blindChase.lib.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
