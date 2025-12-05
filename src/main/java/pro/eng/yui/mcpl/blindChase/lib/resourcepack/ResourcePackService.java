@@ -147,9 +147,9 @@ public final class ResourcePackService {
                 conn.setConnectTimeout(timeoutMs);
                 conn.setReadTimeout(timeoutMs);
                 int code = conn.getResponseCode();
-                InputStream in = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
+                InputStream in = (200 <= code && code < 300) ? conn.getInputStream() : conn.getErrorStream();
                 byte[] body = readAllBytes(in);
-                if (code >= 200 && code < 300) {
+                if (200 <= code && code < 300) {
                     return body;
                 }
                 last = new IOException("HTTP " + code + ": " + new String(body));
