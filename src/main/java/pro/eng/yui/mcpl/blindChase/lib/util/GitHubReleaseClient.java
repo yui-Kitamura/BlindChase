@@ -16,11 +16,23 @@ import java.util.regex.Pattern;
  */
 public final class GitHubReleaseClient {
 
-    static final class ResolvedAsset {
-        final String tag;
-        final String assetName;
-        final String downloadUrl;
-        final String sha1Url; // may be null
+    public static final class ResolvedAsset {
+        private final String tag;
+        public String getTag() {
+            return tag;
+        }
+        private final String assetName;
+        public String getAssetName() {
+            return assetName;
+        }
+        private final String downloadUrl;
+        public String getDownloadUrl() {
+            return downloadUrl;
+        }
+        private final String sha1Url; // may be null
+        public String getSha1Url() {
+            return sha1Url;
+        }
 
         ResolvedAsset(String tag, String assetName, String downloadUrl, String sha1Url) {
             this.tag = tag;
