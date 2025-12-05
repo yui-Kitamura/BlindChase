@@ -1,5 +1,10 @@
 package pro.eng.yui.mcpl.blindChase.lib.util;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +13,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -113,21 +117,29 @@ public final class GitHubReleaseClient {
     }
 
     private ResolvedAsset resolveFromReleaseJson(String json) throws IOException {
-        // extract tag_name
-        String tag = matchFirst(json, "\\\"tag_name\\\"\\s*:\\s*\\\"(.*?)\\\"");
-        if (tag == null){ tag = ""; }
-        // iterate assets by simplistic regex for name and browser_download_url
-        Pattern assetBlock = Pattern.compile("\\{[^{}]*\\\"name\\\"\\s*:\\s*\\\"(.*?)\\\"[^{}]*\\\"browser_download_url\\\"\\s*:\\s*\\\"(.*?)\\\"[^{}]*\\}", Pattern.DOTALL);
-        Matcher m = assetBlock.matcher(json);
+        JsonElement rootEl = JsonParser.parseString(json);
+        if (!rootEl.isJsonObject()) {
+            throw new IOException("Invalid GitHub release JSON: not an object");
+        }
+        JsonObject obj = rootEl.getAsJsonObject();
+        String tag = obj.has("tag_name") && !obj.get("tag_name").isJsonNull()
+                ? obj.get("tag_name").getAsString()
+                : "";
+
+        if (!obj.has("assets") || !obj.get("assets").isJsonArray()) {
+            throw new IOException("GitHub release JSON does not contain assets array");
+        }
+        JsonArray assets = obj.getAsJsonArray("assets");
+
         String foundName = null;
         String foundUrl = null;
         String sha1Url = null;
-        while (m.find()) {
-            String name = m.group(1);
-            String url = m.group(2);
-            if (name == null || url == null) {
-                continue;
-            }
+        for (JsonElement asset : assets) {
+            if (!asset.isJsonObject()) { continue; }
+            JsonObject assetObj = asset.getAsJsonObject();
+            final String name = (assetObj.has("name") && assetObj.get("name").isJsonNull() == false) ? assetObj.get("name").getAsString() : null;
+            final String url = (assetObj.has("browser_download_url") && assetObj.get("browser_download_url").isJsonNull() == false) ? assetObj.get("browser_download_url").getAsString() : null;
+            if (name == null || url == null) { continue; }
             if (assetNamePattern.matcher(name).matches()) {
                 foundName = name;
                 foundUrl = url;
@@ -140,11 +152,5 @@ public final class GitHubReleaseClient {
             throw new IOException("No asset matched pattern in release: " + assetNamePattern);
         }
         return new ResolvedAsset(tag, foundName, foundUrl, sha1Url);
-    }
-
-    private static String matchFirst(String src, String pattern) {
-        Matcher m = Pattern.compile(pattern, Pattern.DOTALL).matcher(src);
-        if (m.find()){ return m.group(1); }
-        return null;
     }
 }
