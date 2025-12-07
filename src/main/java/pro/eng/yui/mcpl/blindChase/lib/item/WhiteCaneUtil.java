@@ -4,7 +4,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -22,6 +21,9 @@ public final class WhiteCaneUtil {
     private static final NamespacedKey KEY = new NamespacedKey(BlindChase.plugin(), "white_cane");
     // Adjust to match your resource pack's CustomModelData id
     private static final int CUSTOM_MODEL_DATA = 10_001;
+    // Optional animation frames for right-click sway
+    public static final int CMD_SWAY_LEFT = 10_011;
+    public static final int CMD_SWAY_RIGHT = 10_013;
 
     private WhiteCaneUtil() {
     }
@@ -57,8 +59,7 @@ public final class WhiteCaneUtil {
     }
 
     /**
-     * Checks if the player holds the White Cane in their dominant hand.
-     * Dominant hand equals the player's main hand setting.
+     * Checks if the player holds the White Cane in their main hand.
      */
     public static boolean isHoldingCaneInMainHand(Player player) {
         if (player == null) { return false; }
@@ -66,4 +67,8 @@ public final class WhiteCaneUtil {
         return isWhiteCane(inMain);
     }
 
+    /** Base CustomModelData value for the cane. */
+    public static int getBaseCustomModelData() {
+        return CUSTOM_MODEL_DATA;
+    }
 }

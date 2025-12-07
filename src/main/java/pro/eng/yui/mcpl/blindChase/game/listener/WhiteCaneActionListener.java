@@ -1,12 +1,12 @@
 package pro.eng.yui.mcpl.blindChase.game.listener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -16,12 +16,17 @@ import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import pro.eng.yui.mcpl.blindChase.lib.item.WhiteCaneUtil;
+import pro.eng.yui.mcpl.blindChase.BlindChase;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 /**
  * Handles right-click actions with the White Cane applying a 0.6s per-player cooldown.
@@ -33,6 +38,8 @@ public class WhiteCaneActionListener implements Listener {
      * Static so it can be reset from game control flows (e.g., start command).
      */
     private static final Map<UUID, Long> lastUse = new HashMap<>();
+    /** Tracks players currently playing the sway animation to avoid overlap. */
+    private static final Set<UUID> animating = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /** Clear the stored last-use time for given player. */
     public static void clearLastUse(UUID playerId) {
@@ -82,6 +89,9 @@ public class WhiteCaneActionListener implements Listener {
         if (ticks > 0) {
             player.setCooldown(Material.STICK, ticks);
         }
+
+        // Start sway animation on right-click
+        startSwayAnimation(player);
     }
 
     /**
@@ -89,8 +99,7 @@ public class WhiteCaneActionListener implements Listener {
      */
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        if (!(event.getDamager() instanceof Player)) { return; }
-        Player damager = (Player) event.getDamager();
+        if (!(event.getDamager() instanceof Player damager)) { return; }
         if (!WhiteCaneUtil.isHoldingCaneInMainHand(damager)) { return; }
         // Cancel the damage to effectively disable attack with the cane
         event.setCancelled(true);
@@ -143,5 +152,67 @@ public class WhiteCaneActionListener implements Listener {
         Player player = event.getPlayer();
         if (!WhiteCaneUtil.isHoldingCaneInMainHand(player)) { return; }
         event.setCancelled(true);
+    }
+
+    // --- Animation helpers ---
+    private void startSwayAnimation(Player player) {
+        UUID id = player.getUniqueId();
+        if (!animating.add(id)) { return; } // already animating
+
+        final int base = WhiteCaneUtil.getBaseCustomModelData();
+        final int left = WhiteCaneUtil.CMD_SWAY_LEFT;
+        final int right = WhiteCaneUtil.CMD_SWAY_RIGHT;
+
+        final int[] frames = new int[] { left, right, left, base };
+        final int periodTicks = 2; // every 2 ticks (~0.1s)
+
+        final int taskId = Bukkit.getScheduler().runTaskTimer(BlindChase.plugin(), () -> {
+            try {
+                if (!player.isOnline() || !WhiteCaneUtil.isHoldingCaneInMainHand(player)) {
+                    // Player no longer valid or not holding cane: stop and try to restore base
+                    setCaneCMD(player, base);
+                    Bukkit.getScheduler().cancelTask(taskHolder.id);
+                    animating.remove(id);
+                    return;
+                }
+                int step = taskHolder.step;
+                if (step >= frames.length) {
+                    setCaneCMD(player, base);
+                    Bukkit.getScheduler().cancelTask(taskHolder.id);
+                    animating.remove(id);
+                    return;
+                }
+                setCaneCMD(player, frames[step]);
+                taskHolder.step++;
+            } catch (Exception ex) {
+                // Ensure cleanup on any unexpected error
+                try { setCaneCMD(player, base); } catch (Exception ignore) {}
+                Bukkit.getScheduler().cancelTask(taskHolder.id);
+                animating.remove(id);
+            }
+        }, 0L, periodTicks).getTaskId();
+
+        // small holder for step and id (workaround for effectively final requirements)
+        taskHolder = new TaskHolder(taskId);
+    }
+
+    private static class TaskHolder {
+        int id;
+        int step = 0;
+        TaskHolder(int id) { this.id = id; }
+    }
+
+    private TaskHolder taskHolder;
+
+    private void setCaneCMD(Player player, int cmd) {
+        ItemStack hand = player.getInventory().getItemInMainHand();
+        if (!WhiteCaneUtil.isWhiteCane(hand)) { return; }
+        ItemMeta meta = hand.getItemMeta();
+        if (meta == null) { return; }
+        meta.setCustomModelData(cmd);
+        hand.setItemMeta(meta);
+        // Force client update by re-setting the stack (optional but helps in some clients)
+        player.getInventory().setItemInMainHand(hand);
+        player.updateInventory();
     }
 }

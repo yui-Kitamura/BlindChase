@@ -7,6 +7,14 @@
     {
       "predicate": { "custom_model_data": 10001 },
       "model": "blindchase:item/white_cane"
+    },
+    {
+      "predicate": { "custom_model_data": 10011 },
+      "model": "blindchase:item/white_cane_sway_left"
+    },
+    {
+      "predicate": { "custom_model_data": 10013 },
+      "model": "blindchase:item/white_cane_sway_right"
     }
   ]
 }
