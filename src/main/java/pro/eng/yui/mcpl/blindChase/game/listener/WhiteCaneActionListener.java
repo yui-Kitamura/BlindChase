@@ -155,9 +155,9 @@ public class WhiteCaneActionListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onPlayerAnimation(PlayerAnimationEvent event) {
         if (event.getAnimationType() != PlayerAnimationType.ARM_SWING) { return; }
-        Player player = event.getPlayer();
-        if (!WhiteCaneUtil.isHoldingCaneInMainHand(player)) { return; }
-        event.setCancelled(true);
+        if (WhiteCaneUtil.isHoldingCaneInMainHand(event.getPlayer())) {
+            event.setCancelled(true);
+        }
     }
 
     // --- Animation helpers ---
