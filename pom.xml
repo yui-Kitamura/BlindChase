@@ -6,7 +6,7 @@
 
     <groupId>pro.eng.yui.mcpl</groupId>
     <artifactId>blindchase</artifactId>
-    <version>0.0.7l</version>
+    <version>0.0.8</version>
     <packaging>jar</packaging>
 
     <name>blindchase</name>
