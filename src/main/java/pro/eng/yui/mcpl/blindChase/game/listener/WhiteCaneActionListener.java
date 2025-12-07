@@ -11,6 +11,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.ItemStack;
@@ -130,5 +132,16 @@ public class WhiteCaneActionListener implements Listener {
                 }
             }
         }
+    }
+
+    /**
+     * Stop the swing animation while holding the White Cane in the main hand.
+     */
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onPlayerAnimation(PlayerAnimationEvent event) {
+        if (event.getAnimationType() != PlayerAnimationType.ARM_SWING) { return; }
+        Player player = event.getPlayer();
+        if (!WhiteCaneUtil.isHoldingCaneInMainHand(player)) { return; }
+        event.setCancelled(true);
     }
 }
