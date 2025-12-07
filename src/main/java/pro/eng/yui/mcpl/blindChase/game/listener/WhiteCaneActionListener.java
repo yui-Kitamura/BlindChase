@@ -114,6 +114,8 @@ public class WhiteCaneActionListener implements Listener {
         // If the item moving to offhand is the White Cane, cancel the swap
         if (WhiteCaneUtil.isWhiteCane(main)) {
             event.setCancelled(true);
+            // ensure client/server stay in sync
+            event.getPlayer().updateInventory();
         }
     }
 
@@ -128,6 +130,7 @@ public class WhiteCaneActionListener implements Listener {
             ItemStack clickedItem = event.getCurrentItem();
             if (WhiteCaneUtil.isWhiteCane(clickedItem)) {
                 event.setCancelled(true);
+                safeUpdateInventory((Player) event.getWhoClicked());
                 return;
             }
         }
@@ -137,7 +140,10 @@ public class WhiteCaneActionListener implements Listener {
             if (event.getSlot() == 40) {
                 ItemStack cursor = event.getCursor();
                 if (WhiteCaneUtil.isWhiteCane(cursor)) {
+                    ItemStack keep = cursor.clone();
                     event.setCancelled(true);
+                    event.getWhoClicked().setItemOnCursor(keep);
+                    safeUpdateInventory((Player) event.getWhoClicked());
                 }
             }
         }
@@ -214,5 +220,10 @@ public class WhiteCaneActionListener implements Listener {
         // Force client update by re-setting the stack (optional but helps in some clients)
         player.getInventory().setItemInMainHand(hand);
         player.updateInventory();
+    }
+
+    private void safeUpdateInventory(Player player) {
+        // Schedule update next tick to ensure server state is authoritative
+        Bukkit.getScheduler().runTask(BlindChase.plugin(), ()->{player.updateInventory();});
     }
 }
