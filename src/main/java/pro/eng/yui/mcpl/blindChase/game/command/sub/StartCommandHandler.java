@@ -11,10 +11,7 @@ import pro.eng.yui.mcpl.blindChase.abst.command.AbstSubCommandRunner;
 import pro.eng.yui.mcpl.blindChase.abst.command.Permissions;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
 import pro.eng.yui.mcpl.blindChase.lib.item.WhiteCaneUtil;
-import pro.eng.yui.mcpl.blindChase.game.listener.WhiteCaneRightClickListener;
-
-import java.util.List;
-import java.util.Map;
+import pro.eng.yui.mcpl.blindChase.game.listener.WhiteCaneActionListener;
 
 /**
  * /blindchase start
@@ -71,7 +68,7 @@ public class StartCommandHandler extends AbstSubCommandRunner {
             inv.setItemInMainHand(cane);
             p.updateInventory();
             // クールダウン(lastUse)とクライアント側のクールダウン表示をリセット
-            WhiteCaneRightClickListener.clearLastUse(p.getUniqueId());
+            WhiteCaneActionListener.clearLastUse(p.getUniqueId());
             p.setCooldown(Material.STICK, 0);
             affected++;
         }

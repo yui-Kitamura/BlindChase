@@ -7,7 +7,7 @@ import pro.eng.yui.mcpl.blindChase.config.BlindChaseConfig;
 import pro.eng.yui.mcpl.blindChase.game.command.CommandHandler;
 import pro.eng.yui.mcpl.blindChase.game.field.FieldGenerator;
 import pro.eng.yui.mcpl.blindChase.lib.field.Field;
-import pro.eng.yui.mcpl.blindChase.game.listener.WhiteCaneRightClickListener;
+import pro.eng.yui.mcpl.blindChase.game.listener.WhiteCaneActionListener;
 import pro.eng.yui.mcpl.blindChase.lib.resourcepack.ResourcePackService;
 import pro.eng.yui.mcpl.blindChase.game.listener.ResourcePackStatusListener;
 import pro.eng.yui.mcpl.blindChase.game.listener.ResourcePackAutoApplyListener;
@@ -79,7 +79,7 @@ public final class BlindChase extends JavaPlugin {
     }
     private void addListeners(){
         PluginManager pm = plugin().getServer().getPluginManager();
-        pm.registerEvents(new WhiteCaneRightClickListener(), this);
+        pm.registerEvents(new WhiteCaneActionListener(), this);
         pm.registerEvents(new ResourcePackStatusListener(), this);
         pm.registerEvents(new ResourcePackAutoApplyListener(), this);
     }

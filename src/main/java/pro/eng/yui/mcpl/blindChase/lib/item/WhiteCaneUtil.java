@@ -60,17 +60,10 @@ public final class WhiteCaneUtil {
      * Checks if the player holds the White Cane in their dominant hand.
      * Dominant hand equals the player's main hand setting.
      */
-    public static boolean isHoldingCaneInDominantHand(Player player) {
+    public static boolean isHoldingCaneInMainHand(Player player) {
         if (player == null) { return false; }
         ItemStack inMain = player.getInventory().getItemInMainHand();
         return isWhiteCane(inMain);
     }
 
-    /**
-     * Helper to know the slot that maps to the player's dominant hand.
-     */
-    public static EquipmentSlot getDominantHandSlot(Player player) {
-        // Bukkit API represents dominant hand by what is considered MAIN_HAND
-        return EquipmentSlot.HAND;
-    }
 }
