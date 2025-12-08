@@ -187,24 +187,27 @@ public class WhiteCaneActionListener implements Listener {
                 if (player.isOnline() == false || WhiteCaneUtil.isHoldingCaneInMainHand(player) == false) {
                     // Player no longer valid or not holding cane: stop and try to restore base
                     setCaneCMD(player, base);
-                    Bukkit.getScheduler().cancelTask(taskHolder.id);
+                    Bukkit.getScheduler().cancelTask(holder.id);
                     animating.remove(id);
+                    tasks.remove(id);
                     return;
                 }
-                int step = taskHolder.step;
+                int step = holder.step;
                 if (step >= frames.length) {
                     setCaneCMD(player, base);
-                    Bukkit.getScheduler().cancelTask(taskHolder.id);
+                    Bukkit.getScheduler().cancelTask(holder.id);
                     animating.remove(id);
+                    tasks.remove(id);
                     return;
                 }
                 setCaneCMD(player, frames[step]);
-                taskHolder.step++;
+                holder.step++;
             } catch (Exception ex) {
                 // Ensure cleanup on any unexpected error
                 try { setCaneCMD(player, base); } catch (Exception ignore) {}
-                Bukkit.getScheduler().cancelTask(taskHolder.id);
+                Bukkit.getScheduler().cancelTask(holder.id);
                 animating.remove(id);
+                tasks.remove(id);
             }
         }, 0L, periodTicks).getTaskId();
 
