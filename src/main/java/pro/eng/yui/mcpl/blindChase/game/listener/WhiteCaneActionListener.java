@@ -40,6 +40,13 @@ public class WhiteCaneActionListener implements Listener {
     private static final Map<UUID, Long> lastUse = new HashMap<>();
     /** Tracks players currently playing the sway animation to avoid overlap. */
     private static final Set<UUID> animating = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    /** Per-player scheduled animation task holders. */
+    private static final Map<UUID, TaskHolder> tasks = new ConcurrentHashMap<>();
+    private static class TaskHolder {
+        int id;
+        int step = 0;
+        TaskHolder(int id) { this.id = id; }
+    }
 
     /** Clear the stored last-use time for given player. */
     public static void clearLastUse(UUID playerId) {
@@ -172,9 +179,12 @@ public class WhiteCaneActionListener implements Listener {
         final int[] frames = new int[] { left, right, left, base };
         final int periodTicks = 2; // every 2 ticks (~0.1s)
 
+        final TaskHolder holder = new TaskHolder(-1);
+        tasks.put(id, holder);
+
         final int taskId = Bukkit.getScheduler().runTaskTimer(BlindChase.plugin(), () -> {
             try {
-                if (!player.isOnline() || !WhiteCaneUtil.isHoldingCaneInMainHand(player)) {
+                if (player.isOnline() == false || WhiteCaneUtil.isHoldingCaneInMainHand(player) == false) {
                     // Player no longer valid or not holding cane: stop and try to restore base
                     setCaneCMD(player, base);
                     Bukkit.getScheduler().cancelTask(taskHolder.id);
@@ -198,17 +208,8 @@ public class WhiteCaneActionListener implements Listener {
             }
         }, 0L, periodTicks).getTaskId();
 
-        // small holder for step and id (workaround for effectively final requirements)
-        taskHolder = new TaskHolder(taskId);
+        holder.id = taskId;
     }
-
-    private static class TaskHolder {
-        int id;
-        int step = 0;
-        TaskHolder(int id) { this.id = id; }
-    }
-
-    private TaskHolder taskHolder;
 
     private void setCaneCMD(Player player, int cmd) {
         ItemStack hand = player.getInventory().getItemInMainHand();
